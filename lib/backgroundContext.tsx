@@ -57,10 +57,13 @@ function setCachedBackground(url: string): void {
   }
 }
 
-// 获取新的随机背景图片
-function fetchNewBackground(): string {
-  // 使用时间戳作为查询参数，确保获取新图片
-  return `https://loliapi.com/acg/?${Date.now()}`;
+// 获取新的随机背景图片（优化：支持低质量占位符）
+function fetchNewBackground(isLowQuality: boolean = false): string {
+  const timestamp = Date.now();
+  // 低质量版本用于预加载
+  return isLowQuality
+    ? `https://loliapi.com/acg/?w=400&${timestamp}`
+    : `https://loliapi.com/acg/?${timestamp}`;
 }
 
 export function BackgroundProvider({ children }: { children: ReactNode }) {
@@ -75,10 +78,18 @@ export function BackgroundProvider({ children }: { children: ReactNode }) {
       // 使用缓存的图片
       setBackgroundUrl(cached);
     } else {
-      // 获取新图片
-      const newUrl = fetchNewBackground();
-      setBackgroundUrl(newUrl);
-      setCachedBackground(newUrl);
+      // 先加载低质量版本作为占位符
+      const lowQualityUrl = fetchNewBackground(true);
+      setBackgroundUrl(lowQualityUrl);
+
+      // 延迟加载高质量版本
+      const highQualityUrl = fetchNewBackground(false);
+      const img = new Image();
+      img.onload = () => {
+        setBackgroundUrl(highQualityUrl);
+        setCachedBackground(highQualityUrl);
+      };
+      img.src = highQualityUrl;
     }
   }, []);
 

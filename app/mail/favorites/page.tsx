@@ -3,25 +3,8 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import { getFavorites, removeFavorite, type TempMail } from '@/lib/mailData';
 import { NavigationMenu, MenuButton } from '@/components/NavigationMenu';
-
-const ICON_PATHS: Record<string, React.ReactElement> = {
-  star: <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>,
-  delete: <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>,
-  copy: <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>,
-  check: <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>,
-  inbox: <path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.89 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/>
-};
-
-const Icon = memo(({ name, className = "w-6 h-6" }: { name: string; className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">{ICON_PATHS[name]}</svg>
-));
-Icon.displayName = 'Icon';
-
-const haptic = (duration: number = 15) => {
-  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-    navigator.vibrate(duration);
-  }
-};
+import { Icon } from '@/components/Icon';
+import { haptic } from '@/lib/utils';
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
